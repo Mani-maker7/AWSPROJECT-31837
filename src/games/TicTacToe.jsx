@@ -36,19 +36,19 @@ const ConfettiCelebration = () => {
 
 const Board = ({ board, onSquareClick, currentTurn, playerId }) => {
   return (
-    <div className="grid grid-cols-3 gap-2 w-72 h-72">
+    <div className="grid grid-cols-3 gap-4 w-[28rem] h-[28rem] mx-auto">
       {board.map((value, index) => (
         <button
           key={index}
           onClick={() => onSquareClick(index)}
           disabled={value !== null || currentTurn !== playerId}
-          className={`h-24 w-24 bg-gray-800 rounded-lg shadow-md flex items-center justify-center text-4xl font-bold
-            ${value === null && currentTurn === playerId ? 'hover:bg-gray-700' : ''}
+          className={`h-full w-full bg-gray-800 rounded-xl shadow-lg flex items-center justify-center text-6xl font-bold
+            ${value === null && currentTurn === playerId ? 'hover:bg-gray-700 cursor-pointer' : 'cursor-not-allowed'}
             ${value === 'X' ? 'text-blue-500' : 'text-red-500'}
-            transition-colors duration-200`}
+            transition-all duration-200`}
         >
           {value === null ? (
-            <Square className="w-8 h-8 text-gray-600" />
+            <Square className="w-12 h-12 text-gray-500" />
           ) : (
             value
           )}
@@ -58,17 +58,26 @@ const Board = ({ board, onSquareClick, currentTurn, playerId }) => {
   );
 };
 
-const PlayerScore = ({ player, isCurrentTurn }) => {
+const PlayerScore = ({ player, isCurrentTurn, isWaiting }) => {
   return (
-    <div className={`p-6 rounded-lg shadow-md ${isCurrentTurn ? 'bg-gray-800 ring-2 ring-blue-500' : 'bg-gray-700'}`}>
-      <div className="flex items-center space-x-3">
+    <div className={`p-6 rounded-xl shadow-lg ${isCurrentTurn ? 'bg-gray-800 ring-2 ring-blue-500' : 'bg-gray-700'} min-w-[240px]`}>
+      <div className="flex items-center space-x-3 mb-4">
         <User className={`w-6 h-6 ${player.symbol === 'X' ? 'text-blue-500' : 'text-red-500'}`} />
-        <span className="font-semibold text-white">{player.name}</span>
+        <div>
+          <span className="font-semibold text-white">{player.name}</span>
+          <span className={`ml-2 text-sm ${player.symbol === 'X' ? 'text-blue-400' : 'text-red-400'}`}>
+            ({player.symbol})
+          </span>
+        </div>
       </div>
-      <div className="mt-3 text-center">
-        <span className="text-3xl font-bold text-white">{player.score}</span>
-        <p className="text-sm text-gray-400">points</p>
-      </div>
+      {isWaiting ? (
+        <div className="text-center py-4 text-gray-300">Waiting for opponent...</div>
+      ) : (
+        <div className="text-center">
+          <span className="text-3xl font-bold text-white">{player.score}</span>
+          <p className="text-sm text-gray-400">Score</p>
+        </div>
+      )}
     </div>
   );
 };
@@ -307,12 +316,12 @@ function TicTacToe() {
         <div className="flex flex-col items-center justify-center h-[80vh]">
           <RoomJoin onJoinRoom={joinRoom} onCreateRoom={createRoom} />
           {isLoading && (
-            <div className="mt-4 p-4 bg-gray-800 text-white rounded-md">
+            <div className="mt-4 p-4 bg-gray-800 text-white rounded-xl">
               Loading...
             </div>
           )}
           {error && (
-            <div className="mt-4 p-4 bg-red-500 text-white rounded-md">
+            <div className="mt-4 p-4 bg-red-500 text-white rounded-xl">
               {error}
             </div>
           )}
@@ -322,7 +331,8 @@ function TicTacToe() {
 
     const currentPlayerTurn = room.players.find(p => p.id === room.gameState.currentTurn);
     const player1 = room.players[0];
-    const player2 = room.players[1] || null;
+    const player2 = room.players[1];
+
 
     return (
       <div className="max-w-6xl mx-auto">
